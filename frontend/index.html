@@ -1,0 +1,258 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="description" content="ARDPS - Airline Reservation and Dynamic Pricing System">
+  <title>ARDPS — Airline Reservation System</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/flatpickr/dist/flatpickr.min.css">
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/flatpickr/dist/themes/dark.css">
+  <link rel="stylesheet" href="/css/style.css">
+</head>
+<body>
+  <!-- ===== NAVIGATION ===== -->
+  <nav class="navbar" id="navbar">
+    <div class="nav-brand">
+      <span class="nav-logo">✈</span>
+      <span class="nav-title">ARDPS</span>
+    </div>
+    <ul class="nav-links">
+      <li><a href="#" class="nav-link active" data-page="search" id="nav-search">Search Flights</a></li>
+      <li><a href="#" class="nav-link" data-page="passengers" id="nav-passengers">Passengers</a></li>
+      <li><a href="#" class="nav-link" data-page="bookings" id="nav-bookings">Bookings</a></li>
+      <li><a href="#" class="nav-link" data-page="tickets" id="nav-tickets">Tickets</a></li>
+      <li><a href="#" class="nav-link" data-page="admin" id="nav-admin">Admin</a></li>
+    </ul>
+  </nav>
+
+  <!-- ===== TOAST NOTIFICATION ===== -->
+  <div class="toast-container" id="toast-container"></div>
+
+  <!-- ===== PAGE: FLIGHT SEARCH ===== -->
+  <section class="page active" id="page-search">
+    <div class="page-header">
+      <h1>Search Flights</h1>
+      <p>Find your perfect flight with real-time pricing</p>
+    </div>
+    <div class="search-card glass-card">
+      <div class="search-form">
+        <div class="form-group">
+          <label for="search-origin">Origin</label>
+          <select id="search-origin" class="form-input">
+            <option value="">Select Origin</option>
+          </select>
+        </div>
+        <div class="form-group">
+          <label for="search-destination">Destination</label>
+          <select id="search-destination" class="form-input">
+            <option value="">Select Destination</option>
+          </select>
+        </div>
+        <div class="form-group">
+          <label for="search-date">Date</label>
+          <input type="date" id="search-date" class="form-input">
+        </div>
+        <button class="btn btn-primary" id="btn-search-flights">Search</button>
+      </div>
+    </div>
+    <div id="flight-results" class="results-grid"></div>
+  </section>
+
+  <!-- ===== PAGE: BOOKING MODAL ===== -->
+  <div class="modal-overlay" id="booking-modal">
+    <div class="modal glass-card modal-lg">
+      <button class="modal-close" id="booking-modal-close">&times;</button>
+      <h2>Book Flight</h2>
+      <div id="booking-flight-info" class="booking-info"></div>
+      <form id="booking-form">
+        <div class="form-row">
+          <div class="form-group">
+            <label for="booking-passenger">Passenger</label>
+            <select id="booking-passenger" class="form-input" required></select>
+          </div>
+          <div class="form-group">
+            <label for="booking-cabin">Cabin Class</label>
+            <select id="booking-cabin" class="form-input" required>
+              <option value="economy">Economy</option>
+              <option value="business">Business</option>
+            </select>
+          </div>
+        </div>
+        <!-- SEAT MAP -->
+        <div class="form-group">
+          <label>Select Your Seat <span id="selected-seat-label" style="color:var(--accent-light);font-weight:700"></span></label>
+          <div class="seat-map-wrapper">
+            <div class="seat-legend">
+              <span class="legend-item"><span class="seat-demo seat-available-demo"></span> Available</span>
+              <span class="legend-item"><span class="seat-demo seat-booked-demo"></span> Booked</span>
+              <span class="legend-item"><span class="seat-demo seat-held-demo"></span> Held</span>
+              <span class="legend-item"><span class="seat-demo seat-selected-demo"></span> Selected</span>
+            </div>
+            <div id="seat-map" class="seat-map"></div>
+          </div>
+          <input type="hidden" id="booking-seat" required>
+        </div>
+        <div class="form-row">
+          <div class="form-group">
+            <label for="booking-payment">Payment Method</label>
+            <select id="booking-payment" class="form-input" required>
+              <option value="card">Card</option>
+              <option value="upi">UPI</option>
+              <option value="wallet">Wallet</option>
+            </select>
+          </div>
+          <div class="form-group">
+            <label for="booking-meal">Meal Preference</label>
+            <select id="booking-meal" class="form-input">
+              <option value="">None</option>
+              <option value="vegetarian">Vegetarian</option>
+              <option value="non-veg">Non-Vegetarian</option>
+              <option value="vegan">Vegan</option>
+            </select>
+          </div>
+        </div>
+        <div id="booking-pricing" class="pricing-breakdown"></div>
+        <button type="submit" class="btn btn-primary btn-full" id="btn-confirm-booking">Confirm Booking</button>
+      </form>
+    </div>
+  </div>
+
+  <!-- ===== PAGE: PASSENGERS ===== -->
+  <section class="page" id="page-passengers">
+    <div class="page-header">
+      <h1>Passengers</h1>
+      <p>Manage passenger profiles</p>
+    </div>
+    <div class="split-view">
+      <div class="glass-card form-card">
+        <h3>Register New Passenger</h3>
+        <form id="passenger-form">
+          <div class="form-group">
+            <label for="pax-name">Full Name</label>
+            <input type="text" id="pax-name" class="form-input" placeholder="John Doe" required>
+          </div>
+          <div class="form-group">
+            <label for="pax-email">Email</label>
+            <input type="email" id="pax-email" class="form-input" placeholder="john@email.com" required>
+          </div>
+          <div class="form-group">
+            <label for="pax-phone">Phone</label>
+            <input type="text" id="pax-phone" class="form-input" placeholder="+91-9876543210" required>
+          </div>
+          <div class="form-group">
+            <label for="pax-passport">Passport Number</label>
+            <input type="text" id="pax-passport" class="form-input" placeholder="Z1234567">
+          </div>
+          <div class="form-group">
+            <label for="pax-nationality">Nationality</label>
+            <input type="text" id="pax-nationality" class="form-input" placeholder="Indian" required>
+          </div>
+          <div class="form-group">
+            <label for="pax-dob">Date of Birth</label>
+            <input type="date" id="pax-dob" class="form-input" required>
+          </div>
+          <div class="form-row">
+            <div class="form-group">
+              <label for="pax-meal">Meal Preference</label>
+              <select id="pax-meal" class="form-input">
+                <option value="">None</option>
+                <option value="vegetarian">Vegetarian</option>
+                <option value="non-veg">Non-Veg</option>
+              </select>
+            </div>
+            <div class="form-group">
+              <label for="pax-seat">Seat Preference</label>
+              <select id="pax-seat" class="form-input">
+                <option value="">None</option>
+                <option value="window">Window</option>
+                <option value="aisle">Aisle</option>
+                <option value="middle">Middle</option>
+              </select>
+            </div>
+          </div>
+          <button type="submit" class="btn btn-primary btn-full">Register Passenger</button>
+        </form>
+      </div>
+      <div class="list-card">
+        <h3>Registered Passengers</h3>
+        <div id="passengers-list" class="list-container"></div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ===== PAGE: BOOKINGS ===== -->
+  <section class="page" id="page-bookings">
+    <div class="page-header">
+      <h1>Bookings Dashboard</h1>
+      <p>View and manage all bookings</p>
+    </div>
+    <div id="bookings-list" class="results-grid"></div>
+  </section>
+
+  <!-- ===== CANCEL MODAL ===== -->
+  <div class="modal-overlay" id="cancel-modal">
+    <div class="modal glass-card modal-sm">
+      <button class="modal-close" id="cancel-modal-close">&times;</button>
+      <h2>Cancel Booking</h2>
+      <p id="cancel-info"></p>
+      <div class="form-group">
+        <label for="cancel-reason">Reason</label>
+        <textarea id="cancel-reason" class="form-input" rows="3" placeholder="Reason for cancellation..."></textarea>
+      </div>
+      <div class="modal-actions">
+        <button class="btn btn-secondary" id="btn-cancel-dismiss">Keep Booking</button>
+        <button class="btn btn-danger" id="btn-confirm-cancel">Confirm Cancel</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- ===== PAGE: TICKETS ===== -->
+  <section class="page" id="page-tickets">
+    <div class="page-header">
+      <h1>Ticket Lookup</h1>
+      <p>Search by PNR or view all tickets</p>
+    </div>
+    <div class="search-card glass-card">
+      <div class="search-form search-inline">
+        <div class="form-group">
+          <label for="ticket-pnr">PNR Number</label>
+          <input type="text" id="ticket-pnr" class="form-input" placeholder="PNR-001">
+        </div>
+        <button class="btn btn-primary" id="btn-search-ticket">Search</button>
+        <button class="btn btn-secondary" id="btn-all-tickets">All Tickets</button>
+      </div>
+    </div>
+    <div id="ticket-result" class="ticket-display"></div>
+    <div id="tickets-list" class="results-grid"></div>
+  </section>
+
+  <!-- ===== PAGE: ADMIN DASHBOARD ===== -->
+  <section class="page" id="page-admin">
+    <div class="page-header">
+      <h1>Admin Dashboard</h1>
+      <p>System analytics and overview</p>
+    </div>
+    <div class="stats-grid" id="admin-stats"></div>
+    <div class="charts-grid">
+      <div class="glass-card chart-card">
+        <h3>Revenue by Cabin Class</h3>
+        <div id="chart-revenue" class="chart-container"></div>
+      </div>
+      <div class="glass-card chart-card">
+        <h3>Flight Occupancy</h3>
+        <div id="chart-occupancy" class="chart-container"></div>
+      </div>
+      <div class="glass-card chart-card">
+        <h3>Booking Status</h3>
+        <div id="chart-bookings" class="chart-container"></div>
+      </div>
+    </div>
+  </section>
+
+  <script src="https://cdn.jsdelivr.net/npm/flatpickr"></script>
+  <script src="/js/app.js"></script>
+</body>
+</html>
