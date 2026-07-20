@@ -22,8 +22,6 @@
 
 <p><em>A production-ready full-stack airline reservation platform featuring real-time seat management, dynamic pricing, concurrency control, and an integrated admin dashboard — all from a single Node.js server.</em></p>
 
-[Features](#-features) · [Tech Stack](#-tech-stack) · [Architecture](#-system-architecture) · [Class Diagram](#-class-diagram) · [API Reference](#-api-reference) · [Getting Started](#-getting-started) · [Screenshots](#-ui-overview)
-
 </div>
 
 ---
